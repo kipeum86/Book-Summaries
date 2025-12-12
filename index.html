@@ -1,0 +1,1195 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Summaries</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,700;1,400&family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- 기본 및 레이아웃 --- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Lora', 'Noto Sans KR', serif;
+            background-color: #1a1a1a;
+            color: #f0e6d2;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 3rem 1rem;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: -10px; left: -10px; right: -10px; bottom: -10px;
+            background-image: url('https://i.imgur.com/gjeKFsX.jpeg');
+            background-size: cover;
+            background-position: center;
+            filter: blur(8px);
+            z-index: -2;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(10, 5, 0, 0.65);
+            z-index: -1;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+            text-shadow: 2px 2px 8px rgba(0,0,0,0.8);
+        }
+
+        header h1 {
+            font-size: 1.75rem;
+            font-weight: 700;
+        }
+
+        header p {
+            font-size: 0.7rem;
+            opacity: 0.9;
+            margin-top: 0.35rem;
+        }
+
+        .header-nav-group {
+            margin-top: 1.4rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.6rem;
+            flex-wrap: wrap;
+        }
+
+        .nav-button {
+            display: inline-block;
+            padding: 0.42rem 1.26rem;
+            font-family: 'Lora', 'Noto Sans KR', serif;
+            font-size: 0.63rem;
+            font-weight: 700;
+            color: #f0e6d2;
+            text-decoration: none;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(240, 230, 210, 0.4);
+            border-radius: 50px;
+            backdrop-filter: blur(5px);
+            transition: all 0.3s ease;
+        }
+
+        .nav-button:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(240, 230, 210, 0.7);
+            transform: translateY(-3px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        .nav-button.active {
+            background: rgba(240, 230, 210, 0.25);
+            border-color: rgba(240, 230, 210, 0.8);
+            cursor: default;
+        }
+
+        .nav-button.active:hover {
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* ★★★★★ 추가된 부분: 검색창 스타일 ★★★★★ */
+        .search-container {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto 2rem;
+        }
+
+        #search-input {
+            width: 100%;
+            padding: 0.7rem 1.2rem;
+            font-family: 'Lora', 'Noto Sans KR', serif;
+            font-size: 0.8rem;
+            color: #f0e6d2;
+            background-color: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(240, 230, 210, 0.4);
+            border-radius: 50px;
+            outline: none;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+
+        #search-input::placeholder {
+            color: rgba(240, 230, 210, 0.5);
+        }
+
+        #search-input:focus {
+            background-color: rgba(0, 0, 0, 0.5);
+            border-color: rgba(240, 230, 210, 0.8);
+            box-shadow: 0 0 15px rgba(240, 230, 210, 0.1);
+        }
+
+        /* --- 카테고리 필터 스타일 --- */
+        .category-filters {
+            width: 100%;
+            max-width: 1200px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .filter-button {
+            font-family: 'Noto Sans KR', sans-serif;
+            font-size: 0.65rem;
+            font-weight: 500;
+            color: #d1c9bd;
+            background-color: transparent;
+            border: 1px solid rgba(240, 230, 210, 0.3);
+            padding: 0.4rem 1.1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .filter-button:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-color: rgba(240, 230, 210, 0.7);
+            color: #f0e6d2;
+        }
+
+        .filter-button.active {
+            background-color: rgba(240, 230, 210, 0.85);
+            border-color: rgba(240, 230, 210, 0.9);
+            color: #3d2b1f;
+            font-weight: 700;
+            cursor: default;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+
+        /* --- 매거진 랙 스타일 --- */
+        main {
+            width: 100%;
+            max-width: 1200px;
+            perspective: 1500px;
+        }
+
+        .magazine-rack {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, 200px);
+            justify-content: center;
+            gap: 2.5rem;
+            padding: 1rem;
+            transition: opacity 0.3s ease-in-out;
+        }
+
+        .book-item {
+            position: relative;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+            transform-style: preserve-3d;
+            z-index: 1;
+            transition: transform 0.3s ease-out;
+        }
+
+        .book-item:hover {
+            z-index: 10;
+            transform: scale(1.05) translateY(-10px);
+        }
+
+        .book-cover-wrapper {
+            transform-style: preserve-3d;
+            transition: transform 0.1s linear;
+            border-radius: 8px;
+        }
+
+        .book-item:hover .book-cover-wrapper {
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .book-cover-image {
+            width: 100%;
+            height: 300px; 
+            object-fit: cover; 
+            display: block;
+            border-radius: 8px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5), 0 5px 10px rgba(0, 0, 0, 0.3);
+            transition: box-shadow 0.3s ease;
+        }
+
+        .book-item:hover .book-cover-image {
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), 0 10px 15px rgba(0, 0, 0, 0.4);
+        }
+
+        /* --- 모바일 반응형 스타일 --- */
+        @media (max-width: 768px) {
+            body {
+                padding: 2rem 1rem;
+            }
+
+            header h1 {
+                font-size: 1.5rem;
+            }
+            
+            .magazine-rack {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 1rem;
+            }
+
+            .book-cover-image {
+                height: auto;
+            }
+
+            .book-item:active {
+                transform: scale(0.98);
+                transition: transform 0.1s ease;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Book Summaries</h1>
+        <p>Tap for detail / 커버를 탭하여 요약 보기</p>
+        
+        <div class="header-nav-group">
+            <a href="#" class="nav-button active">Book Summaries</a>
+            <a href="https://kipeum86.github.io/Dashboards-and-Archives/" target="_blank" class="nav-button">Dashboard Archives</a>
+            <a href="https://kipeum86.github.io/2025-Reading-List/" target="_blank" class="nav-button">2025 Reading List</a>
+        </div>
+    </header>
+
+    <div class="search-container">
+        <input type="text" id="search-input" placeholder="Search by title or author">
+    </div>
+
+    <div id="category-filter-container" class="category-filters">
+        </div>
+
+    <main>
+        <div id="magazine-rack-container" class="magazine-rack">
+            </div>
+    </main>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const bookData = [
+            // --- 요청하신 책 추가 시작 ---
+           {
+                title: "The Art of Spending Money",
+                author: "Morgan Housel",
+                readDate: "2025. 11. 27.",
+                coverImage: "https://imgur.com/HTNpUep.jpg",
+                category: "Etc.",
+                summaryLink: "https://codepen.io/Kipeum-Lee/full/azNGBGX"
+            },    
+           {
+                title: "The Comfort Crisis",
+                author: "Michael Easter",
+                readDate: "2025. 11. 13.",
+                coverImage: "https://imgur.com/wUFf6ah.jpg",
+                category: "Etc.",
+                summaryLink: "https://codepen.io/Kipeum-Lee/full/Kwzzyrq"
+            },    
+          {
+                title: "Money: A Story of Humanity",
+                author: "David McWilliams",
+                readDate: "2025. 10. 28.",
+                coverImage: "https://i.imgur.com/UyuBeHc.jpg",
+                category: "Econ/Bus, Politics, History",
+                summaryLink: "https://codepen.io/Kipeum-Lee/full/xbZJJJW"
+            },   
+           {
+                title: "Blind Robbery!",
+                author: "Philipp Bagus, Andreas Marquart",
+                readDate: "2025. 9. 13.",
+                coverImage: "https://imgur.com/aeN7yzS.jpg",
+                category: "Econ/Bus, Politics",
+                summaryLink: "https://codepen.io/Kipeum-Lee/full/pvjXezo"
+            },   
+          {
+                title: "Apple in China",
+                author: "Patrick McGee",
+                readDate: "2025. 9. 3.",
+                coverImage: "https://imgur.com/RGwQDbN.jpg",
+                category: "Econ/Bus, Politics",
+                summaryLink: "https://codepen.io/Kipeum-Lee/full/empbJWo"
+            },     
+          {
+                title: "Make it Stick",
+                author: "Peter C. Brown, Henry L. Roediger III, Mark A. McDaniel",
+                readDate: "2025. 7. 31.",
+                coverImage: "https://imgur.com/ReaVwNT.jpg",
+                category: "Science, Korean, Etc.",
+                summaryLink: "https://codepen.io/Kipeum-Lee/full/ZYbrZJj"
+            },     
+          {
+                title: "Empire of AI",
+                author: "Karen Hao",
+                readDate: "2025. 7. 31.",
+                coverImage: "https://imgur.com/GDa58Ny.jpg",
+                category: "Econ/Bus, Science, AI",
+                summaryLink: "https://codepen.io/Kipeum-Lee/full/azvpyLP"
+            },    
+          {
+                title: "Selfish Gene",
+                author: "Richard Dawkins",
+                readDate: "2013. 8. 5.",
+                coverImage: "https://imgur.com/eH5nEJ9.jpg",
+                category: "Science",
+                summaryLink: "https://codepen.io/Kipeum-Lee/full/xbwOLbK"
+            },    
+          {
+                title: "Cosmos",
+                author: "Carl Sagan",
+                readDate: "2014. 3. 12.",
+                coverImage: "https://imgur.com/zNuXPRa.jpg",
+                category: "Science",
+                summaryLink: "https://codepen.io/Kipeum-Lee/full/XJmKaWQ"
+            },   
+          {
+                title: "European Data Proteection",
+                author: "Eduardo Ustaran et al.",
+                readDate: "2023. 5. 4.",
+                coverImage: "https://imgur.com/YGOFqHc.jpg",
+                category: "Law",
+                summaryLink: "https://codepen.io/Kipeum-Lee/full/xbwwbqX"
+            },
+            {
+                title: "Art of Loving (사랑의 기술)",
+                author: "Erich Fromm (에리히 프롬)",
+                readDate: "2013. 12. 29.",
+                coverImage: "https://imgur.com/KIAozET.jpg",
+                category: "Philosophy, Korean, Etc.",
+                summaryLink: "https://codepen.io/Kipeum-Lee/full/raOOavw"
+            },
+            {
+                title: "Bad Blood",
+                author: "John Carreyrou",
+                readDate: "2023. 12. 19.",
+                coverImage: "https://imgur.com/WUmicaN.jpg",
+                category: "Econ/Bus",
+                summaryLink: "https://codepen.io/Kipeum-Lee/full/VYvvLKJ"
+            },
+            {
+                title: "Poverty, by America",
+                author: "Matthew Desmond",
+                readDate: "2023. 12. 24.",
+                coverImage: "https://imgur.com/BehJw7W.jpg",
+                category: "Politics",
+                summaryLink: "https://codepen.io/Kipeum-Lee/full/xbwwREQ"
+            },
+            {
+                title: "Profit Over People",
+                author: "Noam Chomsky",
+                readDate: "2014. 2. 12.",
+                coverImage: "https://imgur.com/pYD4WO6.jpg",
+                category: "Politics",
+                summaryLink: "https://codepen.io/Kipeum-Lee/full/EaVVNWd"
+            },
+            {
+                title: "Hopes and Prospects",
+                author: "Noam Chomsky",
+                readDate: "2014. 2. 28.",
+                coverImage: "https://imgur.com/UEhOqHp.jpg",
+                category: "Politics",
+                summaryLink: "https://codepen.io/Kipeum-Lee/full/WbQQoXO"
+            },
+            // --- 요청하신 책 추가 종료 ---
+            {
+                title: "I, Human",
+                author: "Tomas Chamorro-Premuzic",
+                readDate: "2023. 7. 19.",
+                coverImage: "https://imgur.com/ii5DEVD.jpg",
+                category: "AI, Philosophy, Etc.",
+                summaryLink: "https://codepen.io/Kipeum-Lee/full/KwdpoRj"
+            },
+            {
+                title: "Dear Barack",
+                author: "Claudia Clark",
+                readDate: "2024. 1. 2.",
+                coverImage: "https://imgur.com/bAw5g2W.jpg",
+                category: "Politics, History",
+                summaryLink: "https://codepen.io/Kipeum-Lee/full/xbwGWzR"
+            },
+            {
+                title: "A Short History of Nearly Everything",
+                author: "Bill Bryson",
+                readDate: "2014. 3. 7.",
+                coverImage: "https://imgur.com/Pr447CQ.jpg",
+                category: "Science, History, Etc.",
+                summaryLink: "https://codepen.io/Kipeum-Lee/full/gbapzpZ"
+            },
+            {
+                title: "On Freedom",
+                author: "Timothy Snyder",
+                readDate: "2025. 3. 26.",
+                coverImage: "https://imgur.com/eTmcH0d.jpg",
+                category: "Politics, Philosophy",
+                summaryLink: "https://codepen.io/Kipeum-Lee/full/raOVyWm"
+            },
+            {
+                title: "On Tyranny",
+                author: "Timothy Snyder",
+                readDate: "2025. 3. 16.",
+                coverImage: "https://imgur.com/j6T9Igg.jpg",
+                category: "Politics",
+                summaryLink: "https://codepen.io/Kipeum-Lee/full/qEOdRLX"
+            },
+            {
+                title: "Autocracy, Inc.",
+                author: "Anne Applebaum",
+                readDate: "2025. 1. 11.",
+                coverImage: "https://imgur.com/y2qPewh.jpg",
+                category: "Politics",
+                summaryLink: "https://codepen.io/Kipeum-Lee/full/JoYdWRp"
+            },
+            {
+                title: "Zero to One",
+                author: "Peter Thiel",
+                readDate: "2023. 7. 31.",
+                coverImage: "https://imgur.com/RolfSGG.jpg",
+                category: "Econ/Bus",
+                summaryLink: "https://codepen.io/Kipeum-Lee/pen/yyYNgjL"
+            },
+            {
+                title: "Build",
+                author: "Tony Fadell",
+                coverImage: "https://imgur.com/Digua9j.jpg",
+                category: "Econ/Bus",
+                readDate: "2023. 8. 20.",
+                summaryLink: "https://codepen.io/Kipeum-Lee/full/QwjwwKK"
+            },   
+            {
+                title: "Influence Empire",
+                author: "Lulu Yilun Chen",
+                coverImage: "https://imgur.com/tRmGbqF.jpg",
+                category: "Econ/Bus",
+                readDate: "2022. 12. 28.",
+                summaryLink: "https://codepen.io/Kipeum-Lee/full/YPyPzPE"
+            },
+            {
+                title: "A Brief History of Time",
+                author: "Stephen Hawking",
+                coverImage: "https://imgur.com/cmVFqFO.jpg",
+                category: "Science",
+                readDate: "2014. 4. 9.",
+                summaryLink: "https://codepen.io/Kipeum-Lee/full/wBKBvGR"
+            },
+            {
+                title: "About Time",
+                author: "Paul C.W. Davies",
+                coverImage: "https://imgur.com/kZGH2Ly.jpg",
+                category: "Science",
+                readDate: "2023. 12. 17.",
+                summaryLink: "https://codepen.io/Kipeum-Lee/full/ogjgNBG"
+            },
+            {
+                title: "The Supermajority",
+                author: "Michael Waldman",
+                coverImage: "https://imgur.com/1kigxAh.jpg",
+                category: "Law, Politics",
+                readDate: "2023. 9. 25.",
+                summaryLink: "https://codepen.io/Kipeum-Lee/full/WbQbNZV"
+            },
+            {
+                title: "Atomic Habits(아주 작은 습관의 힘)",
+                author: "James Clear(제임스 클리어)",
+                coverImage: "https://imgur.com/1o830RA.jpg",
+                category: "Korean, Etc.",
+                readDate: "2023. 6. 9.",
+                summaryLink: "https://codepen.io/Kipeum-Lee/full/ZYbYEZe"
+            },
+            {
+                title: "Disorder",
+                author: "Helen Thompson",
+                coverImage: "https://imgur.com/bqteRBo.jpg",
+                category: "Politics",
+                readDate: "2023. 2. 7.",
+                summaryLink: "https://codepen.io/Kipeum-Lee/full/WbQbbGx"
+            },
+            {
+                title: "Stolen Focus",
+                author: "Johan Hari",
+                coverImage: "https://imgur.com/0pbTiFJ.jpg",
+                category: "Etc.",
+                readDate: "2024. 7. 12.",
+                summaryLink: "https://codepen.io/Kipeum-Lee/full/pvjzVaV"
+            },
+            {
+                title: "Price of Inequality",
+                author: "Joseph E. Stiglitz",
+                coverImage: "https://imgur.com/sfOZ9Ce.jpg",
+                category: "Econ/Bus, Politics",
+                readDate: "2014. 1. 31.",
+                summaryLink: "https://codepen.io/Kipeum-Lee/full/NPGKjve"
+            },
+            {
+                title: "Bad Samaritans",
+                author: "Ha-Joon Chang",
+                coverImage: "https://imgur.com/m1QNdYA.jpg",
+                category: "Econ/Bus, Politics",
+                readDate: "2013. 2. 3.",
+                summaryLink: "https://codepen.io/Kipeum-Lee/full/RNWbVGL"
+            },
+            {
+                title: "Road to Serfdom",
+                author: "F.A Hayek",
+                coverImage: "https://imgur.com/B20DEGH.jpg",
+                category: "Econ/Bus, Politics",
+                readDate: "2023. 8. 22.",
+                summaryLink: "https://codepen.io/Kipeum-Lee/full/WbQepdd"
+            },
+            {
+                title: "Introduction to Phenemenology",
+                author: "Robert Sokolowski",
+                coverImage: "https://imgur.com/7UbE08E.jpg",
+                category: "Philosophy",
+                readDate: "2013. 11. 30.",
+                summaryLink: "https://codepen.io/Kipeum-Lee/full/myebRqY"
+            },
+            {
+                title: "The Conquest of Happiness",
+                author: "Burtrand Russell",
+                coverImage: "https://imgur.com/3q0mPBT.jpg",
+                category: "Philosophy",
+                readDate: "2013. 6. 28.",
+                summaryLink: "https://codepen.io/Kipeum-Lee/full/LEpPxbm"
+            },
+            {
+                title: "Escape from Freedom",
+                author: "Erich Fromm",
+                coverImage: "https://imgur.com/u3XCqfM.jpg",
+                category: "Philosophy",
+                readDate: "2014. 1. 1.",
+                summaryLink: "https://codepen.io/Kipeum-Lee/full/raOByer"
+            },
+            {
+                title: "Outliers",
+                author: "Malcolm Gladwell",
+                coverImage: "https://imgur.com/Lk5O3gf.jpg",
+                category: "Econ/Bus, Etc.",
+                readDate: "2013. 6. 1.",
+                summaryLink: "https://codepen.io/Kipeum-Lee/full/vENBxJL"
+            },
+            {
+                title: "Capitalism and Freedom",
+                author: "Milton Friedman",
+                coverImage: "https://imgur.com/gX3QmGr.jpg",
+                category: "Econ/Bus, Politics",
+                readDate: "2013. 5. 19.",
+                summaryLink: "https://codepen.io/Kipeum-Lee/full/ByoBWLp"
+            },
+            {
+                title: "Essays and Aphorisms",
+                author: "Arthur Schopenhauer",
+                readDate: "2013. 6. 14.",
+                category: "Philosophy",
+                coverImage: "https://imgur.com/bAdplGW.jpg",
+                summaryLink: "https://codepen.io/Kipeum-Lee/pen/myJZqOd"
+            },
+            {
+                title: "A Nietzsche Reader",
+                author: "Friedrich Nietzsche",
+                readDate: "2023. 7. 8.",
+                category: "Philosophy",
+                coverImage: "https://imgur.com/6iWK7Tl.jpg",
+                summaryLink: "https://codepen.io/Kipeum-Lee/full/qEdzVdJ"
+            },
+            {
+                title: "떨림과 울림",
+                author: "김상욱",
+                readDate: "2024. 10. 19.",
+                category: "Science, Korean",
+                coverImage: "https://imgur.com/NlWuHqT.jpg",
+                summaryLink: "https://codepen.io/Kipeum-Lee/full/gbpNxvo"
+            },
+            {
+                title: "Nexus",
+                author: "Yuval Noah Harari",
+                readDate: "2024. 9. 25.",
+                category: "Econ/Bus, AI, Science",
+                coverImage: "https://imgur.com/4RCGbL2.jpg",
+                summaryLink: "https://codepen.io/Kipeum-Lee/full/vEOqJjJ"
+            },
+            {
+                title: "How the Big Things Get Done",
+                author: "Bent Flyvbjerg, Dan Gardner",
+                readDate: "2024. 1. 7.",
+                category: "Econ/Bus",
+                coverImage: "https://imgur.com/91Zzjdk.jpg",
+                summaryLink: "https://codepen.io/Kipeum-Lee/full/XJbGaLz"
+            },
+            {
+                title: "Six Easy Pieces",
+                author: "Richard P. Feynman",
+                readDate: "2024. 12. 9.",
+                category: "Science",
+                coverImage: "https://imgur.com/0dIWSFK.jpg",
+                summaryLink: "https://codepen.io/Kipeum-Lee/full/PwqrmZx"
+            },
+            {
+                title: "Unmasking AI",
+                author: "Joy Buolamwini",
+                readDate: "2024. 1. 23.",
+                category: "Politics, AI",
+                coverImage: "https://imgur.com/HYnG3q5.jpg",
+                summaryLink: "https://codepen.io/Kipeum-Lee/full/PwqrmRv"
+            },
+            {
+                title: "The Coming Wave",
+                author: "Mustafa Suleyman",
+                readDate: "2024. 2. 1.",
+                category: "Econ/Bus, AI",
+                coverImage: "https://imgur.com/5ERANvX.jpg",
+                summaryLink: "https://codepen.io/Kipeum-Lee/full/OPVemve"
+            },
+            {
+                title: "Impromptu",
+                author: "Reid Hoffman",
+                readDate: "2022. 6. 23.",
+                category: "Econ/Bus, AI, Philosophy",
+                coverImage: "https://imgur.com/6DcTBiI.jpg",
+                summaryLink: "https://codepen.io/Kipeum-Lee/full/bNdPWwy"
+            },
+            {
+                title: "Nvidia Way",
+                author: "Tae Kim",
+                readDate: "2025. 2. 25.",
+                category: "Econ/Bus, AI",
+                coverImage: "https://imgur.com/Qr9BOE0.jpg",
+                summaryLink: "https://codepen.io/Kipeum-Lee/full/NPqZKpK"
+            },
+            {
+                title: "The Power of Geography",
+                author: "Tim Marshall",
+                readDate: "2024. 4. 2.",
+                category: "Politics, History",
+                coverImage: "https://imgur.com/O6PP5l5.jpg",
+                summaryLink: "https://codepen.io/Kipeum-Lee/full/qEdwQLb"
+            },
+            {
+                title: "Blood and Oil",
+                author: "Bradley Hope, Justin Scheck",
+                readDate: "2023. 9. 18.",
+                category: "Econ/Bus, Politics, History",
+                coverImage: "https://imgur.com/GZWDiPN.jpg",
+                summaryLink: "https://codepen.io/Kipeum-Lee/full/XJbQOmg"
+            },
+            {
+                title: "The World for Sale",
+                author: "Javier Blas, Jack Farchy",
+                readDate: "2024. 1. 15.",
+                category: "Econ/Bus, Politics, History",
+                coverImage: "https://imgur.com/9ZLfqZI.jpg",
+                summaryLink: "https://codepen.io/Kipeum-Lee/full/zxGXevd"
+            },
+            {
+                title: "The Essays of Warren Buffett",
+                author: "Lawrence A. Cunningham, Warren Buffett",
+                readDate: "2022. 9. 11.",
+                category: "Econ/Bus",
+                coverImage: "https://imgur.com/YHH0Ox1.jpg",
+                summaryLink: "https://codepen.io/Kipeum-Lee/full/gbpExqN"
+            },
+            {
+                title: "Supremacy",
+                author: "Parmy Olson",
+                readDate: "2024. 12. 11.",
+                category: "Econ/Bus, AI",
+                coverImage: "https://imgur.com/xNBDaqh.jpeg",
+                summaryLink: "https://codepen.io/Kipeum-Lee/full/NPqJpxV"
+            },
+            {
+                title: "Psychology of Money(돈의 심리학)",
+                author: "Morgan Housel(모건 하우절)",
+                readDate: "2023. 10. 3.",
+                category: "Econ/Bus, Korean",
+                coverImage: "https://i.imgur.com/eGDdg2M.jpeg",
+                summaryLink: "https://codepen.io/Kipeum-Lee/full/myJoWRz"
+            },
+            {
+                title: "The Worlds I see",
+                author: "Fei-Fei Li",
+                readDate: "2023. 12. 4.",
+                category: "Econ/Bus, AI, Etc.",
+                coverImage: "https://imgur.com/3ex7HVs.jpg",
+                summaryLink: "https://codepen.io/Kipeum-Lee/full/raVRVER"
+            },
+            {
+                title: "Prisoners of Geography",
+                author: "Tim Marshall",
+                readDate: "2024. 3. 12.",
+                category: "Politics, History",
+                coverImage: "https://imgur.com/OWGzTGc.jpg",
+                summaryLink: "https://codepen.io/Kipeum-Lee/full/emNXJgd"
+            },
+            {
+                title: "A Random Walk Down Wall Street",
+                author: "Burton G. Malkiel",
+                readDate: "2022. 12. 21.",
+                category: "Econ/Bus",
+                coverImage: "https://i.imgur.com/AbNLE88.jpeg",
+                summaryLink: "https://codepen.io/Kipeum-Lee/full/VYLgOOa"
+            },
+            {
+                title: "The Avoidable War",
+                author: "Kevin Rudd",
+                readDate: "2023. 11. 12.",
+                category: "Politics",
+                coverImage: "https://i.imgur.com/aK2EUId.jpeg",
+                summaryLink: "https://codepen.io/Kipeum-Lee/full/ZYGwded"
+            },
+            {
+                title: "Algorithms to Live By",
+                author: "Brian Christian",
+                readDate: "2024. 7. 4.",
+                category: "AI, Science",
+                coverImage: "https://i.imgur.com/NJ8wglN.jpeg",
+                summaryLink: "https://codepen.io/Kipeum-Lee/full/dPoaBBZ"
+            },
+            {
+                title: "The Tyranny of Merit",
+                author: "Michael J. Sandel",
+                readDate: "2023. 5. 6.",
+                category: "Politics, Philosophy",
+                coverImage: "https://i.imgur.com/gxpf94l.jpeg",
+                summaryLink: "https://codepen.io/Kipeum-Lee/full/RNPvXwJ"
+            },
+            {
+                title: "Why We Sleep",
+                author: "Matthew Walker",
+                readDate: "2024. 6. 25.",
+                category: "Science",
+                coverImage: "https://i.imgur.com/uD89Vlu.jpeg",
+                summaryLink: "https://codepen.io/Kipeum-Lee/full/RNPvXoe"
+            },
+            {
+                title: "This Is How They Tell Me the World Ends",
+                author: "Nicole Perlroth",
+                readDate: "2023. 4. 25.",
+                category: "Econ/Bus, Science, Politics",
+                coverImage: "https://i.imgur.com/C6FqAcN.jpeg",
+                summaryLink: "https://codepen.io/Kipeum-Lee/full/MYwLNYa"
+            },
+            {
+                title: "A Short History of Modern Philosophy",
+                author: "Roger Scruton",
+                readDate: "2013. 2. 27.",
+                category: "Philosophy",
+                coverImage: "https://imgur.com/GBqpYvZ.jpg",
+                summaryLink: "https://codepen.io/Kipeum-Lee/full/bNdOmVW"
+            },
+            {
+                title: "Thinking, Fast and Slow(생각에 관한 생각)",
+                author: "Daniel Kahneman(대니얼 카너먼)",
+                readDate: "2024. 3. 2.",
+                category: "Econ/Bus, Science, Korean",
+                coverImage: "https://i.imgur.com/BoPH3yY.jpeg",
+                summaryLink: "https://codepen.io/Kipeum-Lee/full/gbpwYJv"
+            },
+            {
+                title: "The Rise and Fall of the Neoliberal Order(뉴딜과 신자유주의)",
+                author: "Gary Gerstle(게리 거스틀)",
+                readDate: "2023. 1. 30.",
+                category: "Politics, History, Korean",
+                coverImage: "https://i.imgur.com/fVnLgSf.jpeg",
+                summaryLink: "https://codepen.io/Kipeum-Lee/full/yyNJzyx"
+            },
+            {
+                title: "Behave(행동)",
+                author: "Robert M. Sapolsky(로버트 새폴스키)",
+                readDate: "2025. 5. 21.",
+                category: "Science, Korean",
+                coverImage: "https://i.imgur.com/7AoDbgY.jpeg",
+                summaryLink: "https://codepen.io/Kipeum-Lee/full/MYwyzmj"
+            },
+            {
+                title: "A Brief History of Intelligence",
+                author: "Max Solomon Bennett",
+                readDate: "2024. 8. 10.",
+                category: "Science, AI",
+                coverImage: "https://i.imgur.com/erOdkqK.jpeg",
+                summaryLink: "https://codepen.io/Kipeum-Lee/full/YPXpKwz"
+            },
+            {
+                title: "Why Nations Fail(왜 국가는 실패하는가))",
+                author: "Daron Acemoğlu, James A. Robinson(대런 애스모글루, 제임스 로빈슨)",
+                readDate: "2024. 11. 11.",
+                category: "Politics, History, Korean",
+                coverImage: "https://imgur.com/eZTpIvU.jpeg",
+                summaryLink: "https://codepen.io/Kipeum-Lee/full/XJbyEMN"
+            },
+            {
+                title: "The Kingdom, the Power, and the Glory",
+                author: "Tim Alberta",
+                readDate: "2024. 11. 26.",
+                category: "Politics",
+                coverImage: "https://i.imgur.com/nrKl7Pk.jpeg",
+                summaryLink: "https://codepen.io/Kipeum-Lee/full/bNdwNwV"
+            },
+            {
+                title: "Tyranny of the Minority(어떻게 극단적 소수가 다수를 지배하는가)",
+                author: "Steven Levitsky, Daniel Ziblatt(스티븐 레비츠키, 대니얼 지블랫)",
+                readDate: "2024. 8. 28.",
+                category: "Politics, History, Korean",
+                coverImage: "https://imgur.com/rJaUELl.jpeg",
+                summaryLink: "https://codepen.io/Kipeum-Lee/full/MYwzRRX"
+            },
+            {
+                title: "The Price of Time",
+                author: "Edward Chancellor",
+                readDate: "2023. 10. 22.",
+                category: "Econ/Bus, History",
+                coverImage: "https://imgur.com/o7fcppF.jpeg",
+                summaryLink: "https://codepen.io/Kipeum-Lee/full/WbvLOJV"
+            },
+            {
+                title: "Material World(물질의 세계)",
+                author: "Ed Conway(에드 콘웨이)",
+                readDate: "2024. 2. 18.",
+                category: "Econ/Bus, Korean",
+                coverImage: "https://imgur.com/tEHy1dO.jpeg",
+                summaryLink: "https://codepen.io/Kipeum-Lee/full/RNPxzdB"
+            },
+            {
+                title: "The Alignment Problem",
+                author: "Brian Christian",
+                readDate: "2024. 7. 23.",
+                category: "AI, Science, Politics, Philosophy",
+                coverImage: "https://i.imgur.com/coRosXw.jpeg",
+                summaryLink: "https://codepen.io/Kipeum-Lee/full/ByNLoyP"
+            },
+            {
+                title: "Manias, Panics, and Crashes",
+                author: "Chales P. Kindleberger",
+                readDate: "2012. 12. 26.",
+                category: "Econ/Bus, History",
+                coverImage: "https://imgur.com/1rhWLvM.jpeg",
+                summaryLink: "https://codepen.io/Kipeum-Lee/full/myJaeva"
+            },
+            {
+                title: "Overreach",
+                author: "Matthew Owens",
+                readDate: "2023. 8. 23.",
+                category: "Politics, History",
+                coverImage: "https://imgur.com/ECRCTzX.jpg",
+                summaryLink: "https://codepen.io/Kipeum-Lee/full/EajOQXx"
+            },
+            {
+                title: "Age of Revolutions",
+                author: "Fareed Zakaria",
+                readDate: "2024. 8. 10.",
+                category: "Politics, History",
+                coverImage: "https://imgur.com/g9Y2pY9.jpg",
+                summaryLink: "https://codepen.io/Kipeum-Lee/full/bNdOBdr"
+            },
+            {
+                title: "Glucose Revolution(글루코스 혁명)",
+                author: "Jessie Inchauspé(제시 인차우스페)",
+                readDate: "2025. 6. 2.",
+                category: "Science, Korean",
+                coverImage: "https://i.imgur.com/TGdwtwx.jpeg",
+                summaryLink: "https://ppl-ai-code-interpreter-files.s3.amazonaws.com/web/direct-files/bb227032de685860913db66c3da5742a/f64e4d42-dd0b-4c1e-b69b-31d9035f3772/index.html"
+            },
+            {
+                title: "Power and Prediction",
+                author: "Ajay Agrawal, Joshua Gans, Avi Goldfarb",
+                readDate: "2023. 7. 10.",
+                category: "AI, Politics",
+                coverImage: "https://imgur.com/u86CZnu.jpeg",
+                summaryLink: "https://codepen.io/Kipeum-Lee/full/ZYGmZyv"
+            },
+            {
+                title: "Enlightenment Now",
+                author: "Steven Pinker",
+                readDate: "2024. 12. 29.",
+                category: "Politics, History, Philosophy",
+                coverImage: "https://imgur.com/GLabpqj.jpeg",
+                summaryLink: "https://codepen.io/Kipeum-Lee/full/qEdQKmO"
+            },
+            {
+                title: "행복의 기원",
+                author: "서은국",
+                readDate: "2025. 1. 2.",
+                category: "Science, Korean, Etc.",
+                coverImage: "https://i.imgur.com/LIef2Bg.jpeg",
+                summaryLink: "https://codepen.io/Kipeum-Lee/full/zxGJBZW"
+            },
+            {
+                title: "Guns, Germs, and Steel(총균쇠)",
+                author: "Jared Diamond(재레드 다이아몬드)",
+                readDate: "2013. 1. 26.",
+                category: "History, Science, Korean",
+                coverImage: "https://imgur.com/QjyQoNB.jpeg",
+                summaryLink: "https://codepen.io/Kipeum-Lee/full/jEPQZJR"
+            },
+            {
+                title: "Digital Empire",
+                author: "Anu Bradford",
+                readDate: "2023. 12. 20.",
+                category: "Law",
+                coverImage: "https://imgur.com/nzfBAzb.jpeg",
+                summaryLink: "https://codepen.io/Kipeum-Lee/full/xbGmyEN"
+            },
+            {
+                title: "The Hundred Years' War on Palestine",
+                author: "Rashid Khalidi",
+                readDate: "2024. 8. 29.",
+                category: "Politics, History",
+                coverImage: "https://imgur.com/AR1kZuV.jpg",
+                summaryLink: "https://codepen.io/Kipeum-Lee/full/gbpoNGK"
+            },
+            {
+                title: "The Power Law",
+                author: "Sebastian Mallaby",
+                readDate: "2023. 6. 17.",
+                category: "Econ/Bus, History",
+                coverImage: "https://imgur.com/eCW4yDO.jpg",
+                summaryLink: "https://codepen.io/Kipeum-Lee/full/dPoQgeO"
+            },
+            {
+                title: "Sapiens: A Brief History of Humankind(사피엔스)",
+                author: "Yuval Noah Harari(유발 하라리)",
+                readDate: "2017. 8. 14.",
+                category: "Science, History, Politics, Korean",
+                coverImage: "https://imgur.com/vvBnkXU.jpg",
+                summaryLink: "https://codepen.io/Kipeum-Lee/full/GgJwXxp"
+            },
+            {
+                title: "Genius Makers",
+                author: "Cade Metz",
+                readDate: "2023. 9. 2.",
+                category: "Econ/Bus, History, AI",
+                coverImage: "https://imgur.com/tpSd4YU.jpg",
+                summaryLink: "https://codepen.io/Kipeum-Lee/full/WbvLaYy"
+            },
+            {
+                title: "Factfulness",
+                author: "Hans Rosling, Ola Rosling, Anna Rosling Rönnlund",
+                readDate: "2023. 9. 2.",
+                category: "Econ/Bus, Politics",
+                coverImage: "https://imgur.com/wgq79rc.jpg",
+                summaryLink: "https://codepen.io/Kipeum-Lee/full/raVoQWV"
+            },
+            {
+                title: "Chip War",
+                author: "Chris Miller",
+                readDate: "2023. 1. 10.",
+                category: "Econ/Bus, History",
+                coverImage: "https://imgur.com/dhY7BK7.jpg",
+                summaryLink: "https://codepen.io/Kipeum-Lee/full/WbvYaNd"
+            },
+            {
+                title: "Social Justice Fallacies",
+                author: "Thomas Sowell",
+                readDate: "2024. 1. 17.",
+                category: "Econ/Bus, Politics, History",
+                coverImage: "https://imgur.com/6K6TBNY.jpg",
+                summaryLink: "https://codepen.io/Kipeum-Lee/full/NPqeEjo"
+            },
+            {
+                title: "The Anxious Generation",
+                author: "Jonathan Haidt",
+                readDate: "2024. 8. 13.",
+                category: "Science, Etc.",
+                coverImage: "https://imgur.com/5jIel48.jpg",
+                summaryLink: "https://codepen.io/Kipeum-Lee/full/GgJPwyB"
+            },
+            {
+                title: "M&A 계약의 해부",
+                author: "김성민",
+                readDate: "2025. 3. 24.",
+                category: "Law, Korean",
+                coverImage: "https://imgur.com/1AiRMbl.jpg",
+                summaryLink: "https://codepen.io/Kipeum-Lee/full/OPVqMaL"
+            },
+            {
+                title: "Discrimination and Disparities",
+                author: "Thomas Sowell",
+                readDate: "2025. 6. 30.",
+                category: "Politics",
+                coverImage: "https://imgur.com/tuEVGMB.jpg",
+                summaryLink: "https://codepen.io/Kipeum-Lee/full/wBaXREQ"
+            },
+            {
+                title: "Manufacturing Consent",
+                author: "Edward S. Herman, Noam Chomsky",
+                readDate: "2024. 10. 25.",
+                category: "Politics, History",
+                coverImage: "https://imgur.com/g4Gxv2I.jpg",
+                summaryLink: "https://codepen.io/Kipeum-Lee/full/XJboKdX"
+            },
+            {
+                title: "Think Again(싱크 어게인)",
+                author: "Adam M. Grant(애덤 그랜트)",
+                readDate: "2023. 5. 15.",
+                category: "Science, Korean, Etc.",
+                coverImage: "https://imgur.com/RFwIUiI.jpg",
+                summaryLink: "https://codepen.io/Kipeum-Lee/full/ogXJwXZ"
+            },
+            {
+                title: "The Shadow Docket",
+                author: "Stephen Vladeck",
+                readDate: "2025. 5. 14.",
+                category: "Law, Politics",
+                coverImage: "https://imgur.com/mXwGgLD.jpg",
+                summaryLink: "https://codepen.io/Kipeum-Lee/full/gbpZxyr"
+            },
+            {
+                title: "Co-Intelligence",
+                author: "Ethan Mollick",
+                readDate: "2024. 9. 10.",
+                category: "Econ/Bus, AI",
+                coverImage: "https://imgur.com/KFnmPFy.jpg",
+                summaryLink: "https://codepen.io/Kipeum-Lee/full/MYwZvMG"
+            },
+            {
+                title: "The Narrow Corridor",
+                author: "Daron Acemoğlu, James A. Robinson",
+                readDate: "2025. 2. 24.",
+                category: "Politics, History",
+                coverImage: "https://imgur.com/ra344RV.jpg",
+                summaryLink: "https://codepen.io/Kipeum-Lee/full/ZYGVXWM"
+            }
+        ];
+
+        const rackContainer = document.getElementById('magazine-rack-container');
+        const filterContainer = document.getElementById('category-filter-container');
+        const searchInput = document.getElementById('search-input'); // 검색창 요소
+
+        if (!rackContainer || !filterContainer || !searchInput) return;
+
+        const sortedData = bookData.sort((a, b) => {
+            const parseDate = (dateString) => {
+                const parts = dateString.trim().replace(/\.$/, '').split('. ');
+                return new Date(parts[0], parts[1] - 1, parts[2]);
+            };
+            return parseDate(b.readDate) - parseDate(a.readDate);
+        });
+
+        // ★★★★★ 수정된 부분: 렌더링 함수에 검색 기능 추가 ★★★★★
+        function renderMagazineRack(filterCategory = 'All', searchTerm = '') {
+            rackContainer.innerHTML = '';
+
+            // 1. 카테고리로 먼저 필터링
+            let filteredData = filterCategory === 'All'
+                ? sortedData
+                : sortedData.filter(book => book.category.includes(filterCategory));
+
+            // 2. 검색어로 추가 필터링
+            if (searchTerm) {
+                filteredData = filteredData.filter(book => {
+                    const titleMatch = book.title.toLowerCase().includes(searchTerm);
+                    const authorMatch = book.author.toLowerCase().includes(searchTerm);
+                    return titleMatch || authorMatch;
+                });
+            }
+
+            if (filteredData.length === 0) {
+                rackContainer.innerHTML = '<p style="text-align: center; opacity: 0.7;">No books found.</p>';
+                return;
+            }
+
+            filteredData.forEach(book => {
+                const bookElement = document.createElement('a');
+                bookElement.className = 'book-item';
+                bookElement.href = book.summaryLink;
+                bookElement.target = '_blank';
+                bookElement.title = `${book.title} by ${book.author} - View Summary`;
+                bookElement.innerHTML = `
+                    <div class="book-cover-wrapper">
+                        <img src="${book.coverImage}" alt="${book.title} Cover" class="book-cover-image">
+                    </div>
+                `;
+                rackContainer.appendChild(bookElement);
+            });
+            
+            apply3DTiltEffect();
+        }
+
+        function createCategoryFilters() {
+            const specifiedCategories = ['Econ/Bus', 'Science', 'Politics', 'AI', 'History', 'Philosophy', 'Law', 'Korean', 'Etc.'];
+            const finalCategoryOrder = ['All', ...specifiedCategories];
+
+            filterContainer.innerHTML = finalCategoryOrder.map(cat =>
+                `<button class="filter-button ${cat === 'All' ? 'active' : ''}" data-category="${cat}">${cat}</button>`
+            ).join('');
+
+            // ★★★★★ 수정된 부분: 카테고리 클릭 시 검색어 유지 ★★★★★
+            filterContainer.addEventListener('click', (e) => {
+                if (e.target.classList.contains('filter-button')) {
+                    const selectedCategory = e.target.dataset.category;
+                    filterContainer.querySelectorAll('.filter-button').forEach(btn => btn.classList.remove('active'));
+                    e.target.classList.add('active');
+                    
+                    const currentSearchTerm = searchInput.value.toLowerCase().trim();
+                    renderMagazineRack(selectedCategory, currentSearchTerm);
+                }
+            });
+        }
+
+        // 3D tilt effect on hover
+        function apply3DTiltEffect() {
+            const books = document.querySelectorAll('.book-item');
+            books.forEach(book => {
+                const coverWrapper = book.querySelector('.book-cover-wrapper');
+                if (!coverWrapper) return;
+
+                book.addEventListener('mousemove', (e) => {
+                    const rect = book.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    const centerX = rect.width / 2;
+                    const centerY = rect.height / 2;
+                    const rotateX = (y - centerY) / centerY * -10;
+                    const rotateY = (x - centerX) / centerX * 10;
+
+                    requestAnimationFrame(() => {
+                        coverWrapper.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+                    });
+                });
+
+                book.addEventListener('mouseleave', () => {
+                    requestAnimationFrame(() => {
+                        coverWrapper.style.transform = 'rotateX(0deg) rotateY(0deg)';
+                    });
+                });
+            });
+        }
+
+        // ★★★★★ 추가된 부분: 검색창 이벤트 리스너 ★★★★★
+        function addSearchListener() {
+            searchInput.addEventListener('input', () => {
+                const searchTerm = searchInput.value.toLowerCase().trim();
+                const activeCategory = filterContainer.querySelector('.filter-button.active').dataset.category;
+                renderMagazineRack(activeCategory, searchTerm);
+            });
+        }
+
+        function init() {
+            createCategoryFilters();
+            addSearchListener(); // 검색 리스너 추가
+            renderMagazineRack('All', ''); // 초기 렌더링
+        }
+
+        init();
+    });
+    </script>
+</body>
+</html>
